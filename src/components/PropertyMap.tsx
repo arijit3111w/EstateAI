@@ -81,35 +81,37 @@ const PropertyMap = ({ targetPrice }: Props) => {
       style={{ height: '100%', width: '100%' }}
       className="rounded-lg"
     >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {properties.map((property) => (
-        <CircleMarker
-          key={property.id}
-          center={[property.latitude, property.longitude]}
-          radius={8}
-          pathOptions={{
-            fillColor: "#f59e0b",
-            color: "#fff",
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.7,
-          }}
-        >
-          <Popup>
-            <div className="p-2">
-              <div className="font-semibold text-lg mb-2">₹{(property.price / 100000).toFixed(2)}L</div>
-              <div className="text-sm space-y-1">
-                <div>{property.bedrooms} beds • {property.bathrooms} baths</div>
-                <div>{property.living_area.toFixed(0)} sq ft</div>
-                <div>Grade: {property.grade}</div>
+      <>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {properties.map((property) => (
+          <CircleMarker
+            key={property.id}
+            center={[property.latitude, property.longitude]}
+            radius={8}
+            pathOptions={{
+              fillColor: "#f59e0b",
+              color: "#fff",
+              weight: 2,
+              opacity: 1,
+              fillOpacity: 0.7,
+            }}
+          >
+            <Popup>
+              <div className="p-2">
+                <div className="font-semibold text-lg mb-2">₹{(property.price / 100000).toFixed(2)}L</div>
+                <div className="text-sm space-y-1">
+                  <div>{property.bedrooms} beds • {property.bathrooms} baths</div>
+                  <div>{property.living_area.toFixed(0)} sq ft</div>
+                  <div>Grade: {property.grade}</div>
+                </div>
               </div>
-            </div>
-          </Popup>
-        </CircleMarker>
-      ))}
+            </Popup>
+          </CircleMarker>
+        ))}
+      </>
     </MapContainer>
   );
 };

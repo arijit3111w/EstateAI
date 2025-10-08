@@ -93,34 +93,36 @@ const HeatmapView = ({ priceRange, gradeFilter }: Props) => {
       style={{ height: '100%', width: '100%' }}
       className="rounded-lg"
     >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {points.map((point) => (
-        <CircleMarker
-          key={point.id}
-          center={[point.lat, point.lng]}
-          radius={6}
-          pathOptions={{
-            fillColor: getColor(point.price),
-            color: "#fff",
-            weight: 1,
-            opacity: 0.8,
-            fillOpacity: 0.6,
-          }}
-        >
-          <Popup>
-            <div className="p-2">
-              <div className="font-semibold text-lg mb-2">₹{(point.price / 100000).toFixed(2)}L</div>
-              <div className="text-sm space-y-1">
-                <div>{point.bedrooms} beds • {point.bathrooms} baths</div>
-                <div>Grade: {point.grade}</div>
+      <>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {points.map((point) => (
+          <CircleMarker
+            key={point.id}
+            center={[point.lat, point.lng]}
+            radius={6}
+            pathOptions={{
+              fillColor: getColor(point.price),
+              color: "#fff",
+              weight: 1,
+              opacity: 0.8,
+              fillOpacity: 0.6,
+            }}
+          >
+            <Popup>
+              <div className="p-2">
+                <div className="font-semibold text-lg mb-2">₹{(point.price / 100000).toFixed(2)}L</div>
+                <div className="text-sm space-y-1">
+                  <div>{point.bedrooms} beds • {point.bathrooms} baths</div>
+                  <div>Grade: {point.grade}</div>
+                </div>
               </div>
-            </div>
-          </Popup>
-        </CircleMarker>
-      ))}
+            </Popup>
+          </CircleMarker>
+        ))}
+      </>
     </MapContainer>
   );
 };
