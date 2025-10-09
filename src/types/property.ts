@@ -51,3 +51,29 @@ export interface PropertyData {
   living_area: number;
   grade: number;
 }
+
+export interface DetailedPropertyData {
+  id: string;
+  date: string;
+  number_of_bedrooms: number;
+  number_of_bathrooms: number;
+  living_area: number;
+  lot_area: number;
+  number_of_floors: number;
+  waterfront_present: number;
+  number_of_views: number;
+  condition_of_house: number;
+  grade_of_house: number;
+  area_excluding_basement: number;
+  area_of_basement: number;
+  built_year: number;
+  renovation_year: number;
+  postal_code: number;
+  latitude: number;
+  longitude: number;
+  living_area_renov: number;
+  lot_area_renov: number;
+  number_of_schools_nearby: number;
+  distance_from_airport: number;
+  price: number;
+}
