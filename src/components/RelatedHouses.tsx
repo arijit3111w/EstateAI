@@ -4,9 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Home, Bath, Bed, Calendar, DollarSign, Eye } from 'lucide-react';
 import PropertyMap from './PropertyMap';
 import PropertyDetails from './PropertyDetails';
+import FavoriteButton from './FavoriteButton';
 import { fetchPropertyDetails, fetchPropertyDetailsByCoords } from '@/lib/api';
 import { DetailedPropertyData } from '@/types/property';
 import { usePrediction } from '@/contexts/PredictionContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HouseData {
   id: string;
@@ -41,6 +43,7 @@ interface RelatedHousesProps {
 }
 
 const RelatedHouses = ({ targetPrice, targetFeatures }: RelatedHousesProps) => {
+  const { t } = useLanguage();
   const { 
     setRelatedHouses: setContextRelatedHouses, 
     relatedHouses: contextRelatedHouses,
@@ -253,7 +256,7 @@ const RelatedHouses = ({ targetPrice, targetFeatures }: RelatedHousesProps) => {
       <Card className="p-6 bg-white shadow-lg border-0">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Home className="h-5 w-5 text-blue-600" />
-          Related Properties
+          {t('predict.related.title')}
         </h3>
         <div className="animate-pulse space-y-4">
           {[...Array(3)].map((_, i) => (
@@ -270,14 +273,14 @@ const RelatedHouses = ({ targetPrice, targetFeatures }: RelatedHousesProps) => {
       <Card className="p-6 bg-white shadow-lg border-0">
         <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
           <Home className="h-5 w-5 text-blue-600" />
-          Related Properties & Map Location
+          {t('predict.related.title')} & {t('predict.related.mapLocation')}
         </h3>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: Related Houses Cards - Takes 2/3 width on large screens */}
           <div className="lg:col-span-2">
             <h4 className="text-md font-medium mb-4 text-slate-700">
-              {relatedHouses.length} Similar Properties Found
+              {relatedHouses.length} {t('predict.related.similarProperties')}
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-2">
               {relatedHouses.map((house, index) => (
@@ -292,11 +295,36 @@ const RelatedHouses = ({ targetPrice, targetFeatures }: RelatedHousesProps) => {
                   onClick={() => handleHouseClick(house)}
                 >
                   <div className="flex justify-between items-start mb-3">
-                    <Badge variant="outline" className={`text-xs border-blue-300 ${
-                      selectedHouse === house.id ? 'text-blue-800 bg-blue-50' : 'text-blue-700'
-                    }`}>
-                      #{index + 1} • {(house.similarity! * 100).toFixed(0)}% match
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className={`text-xs border-blue-300 ${
+                        selectedHouse === house.id ? 'text-blue-800 bg-blue-50' : 'text-blue-700'
+                      }`}>
+                        #{index + 1} • {(house.similarity! * 100).toFixed(0)}% {t('predict.related.match')}
+                      </Badge>
+                      <FavoriteButton 
+                        houseId={house.id} 
+                        houseData={{
+                          id: house.id,
+                          price: house.price,
+                          bedrooms: house.bedrooms,
+                          bathrooms: house.bathrooms,
+                          living_area: house.living_area,
+                          lot_area: house.lot_area,
+                          built_year: house.built_year,
+                          grade: house.grade,
+                          condition: house.condition,
+                          latitude: house.latitude,
+                          longitude: house.longitude,
+                          waterfront: house.waterfront,
+                          views: house.views,
+                          schools_nearby: house.schools_nearby,
+                          distance_from_airport: house.distance_from_airport
+                        }}
+                        variant="ghost" 
+                        size="icon"
+                        className="h-6 w-6 text-gray-500 hover:text-red-500"
+                      />
+                    </div>
                     <div className="text-right">
                       <div className={`text-lg font-bold ${
                         selectedHouse === house.id ? 'text-blue-800' : 'text-blue-700'
@@ -309,15 +337,15 @@ const RelatedHouses = ({ targetPrice, targetFeatures }: RelatedHousesProps) => {
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     <div className="flex items-center gap-1 text-sm text-slate-600">
                       <Bed className="h-3 w-3" />
-                      <span>{house.bedrooms} beds</span>
+                      <span>{house.bedrooms} {t('predict.related.beds')}</span>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-slate-600">
                       <Bath className="h-3 w-3" />
-                      <span>{house.bathrooms} baths</span>
+                      <span>{house.bathrooms} {t('predict.related.baths')}</span>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-slate-600">
                       <Home className="h-3 w-3" />
-                      <span>{house.living_area.toLocaleString()} sqft</span>
+                      <span>{house.living_area.toLocaleString()} {t('predict.related.sqft')}</span>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-slate-600">
                       <Calendar className="h-3 w-3" />
@@ -332,11 +360,11 @@ const RelatedHouses = ({ targetPrice, targetFeatures }: RelatedHousesProps) => {
                     </div>
                     <div className="flex gap-1 items-center">
                       <Badge variant="secondary" className="text-xs px-2 py-1">
-                        Grade {house.grade}
+                        {t('predict.related.grade')} {house.grade}
                       </Badge>
                       {house.waterfront === 1 && (
                         <Badge variant="outline" className="text-xs px-2 py-1 text-blue-600 border-blue-300">
-                          Waterfront
+                          {t('predict.related.waterfront')}
                         </Badge>
                       )}
                       {selectedHouse === house.id && (
@@ -350,7 +378,7 @@ const RelatedHouses = ({ targetPrice, targetFeatures }: RelatedHousesProps) => {
                   <div className="flex items-center justify-between mt-2">
                     {selectedHouse === house.id && (
                       <div className="text-xs text-blue-700 font-medium">
-                        🗺️ View on map
+                        🗺️ {t('predict.related.viewOnMap')}
                       </div>
                     )}
                     <button
@@ -358,7 +386,7 @@ const RelatedHouses = ({ targetPrice, targetFeatures }: RelatedHousesProps) => {
                       className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline transition-colors duration-200 ml-auto"
                     >
                       <Eye className="h-3 w-3" />
-                      View Details
+                      {t('predict.related.viewDetails')}
                     </button>
                   </div>
                 </Card>
@@ -370,7 +398,7 @@ const RelatedHouses = ({ targetPrice, targetFeatures }: RelatedHousesProps) => {
           <div className="lg:col-span-1">
             <h4 className="text-md font-medium mb-4 text-slate-700 flex items-center gap-2">
               <MapPin className="h-4 w-4 text-green-600" />
-              Map Location
+              {t('predict.related.mapLocation')}
             </h4>
             <div className="h-[500px] rounded-lg overflow-hidden border border-slate-200">
               <PropertyMap 

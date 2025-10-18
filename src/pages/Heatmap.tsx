@@ -3,11 +3,13 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeatmapView from '@/components/HeatmapView';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 
 const Heatmap = () => {
+  const { t } = useLanguage();
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000000]);
   const [gradeFilter, setGradeFilter] = useState<string>('all');
 
@@ -18,9 +20,9 @@ const Heatmap = () => {
       <main className="flex-1">
         <div className="bg-primary text-primary-foreground py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold mb-4">Real Estate Price Heatmap</h1>
+            <h1 className="text-4xl font-bold mb-4">{t('heatmap.title')}</h1>
             <p className="text-xl text-primary-foreground/90">
-              Explore real property prices from the dataset with interactive color-coded visualization
+              {t('heatmap.subtitle')}
             </p>
           </div>
         </div>

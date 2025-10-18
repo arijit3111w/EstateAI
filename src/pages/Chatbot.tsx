@@ -4,10 +4,12 @@ import Footer from '@/components/Footer';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Bot, User, Home, MapPin, Bed, Bath, Star, Calendar, DollarSign } from 'lucide-react';
+import { Send, Bot, User, Home, MapPin, Bed, Bath, Star, Calendar, DollarSign, Mic, MicOff } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { usePrediction } from '@/contexts/PredictionContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import FavoriteButton from '@/components/FavoriteButton';
 
 interface Message {
   id: string;
@@ -36,6 +38,7 @@ interface Property {
 
 const Chatbot = () => {
   const { prediction, relatedHouses } = usePrediction();
+  const { t } = useLanguage();
   
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -50,12 +53,95 @@ const Chatbot = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Voice recognition states
+  const [isListening, setIsListening] = useState(false);
+  const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
+  const [transcript, setTranscript] = useState('');
+  const [isVoiceSupported, setIsVoiceSupported] = useState(false);
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isTyping]);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        setIsVoiceSupported(true);
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+          setIsListening(true);
+          setTranscript('');
+        };
+
+        recognition.onresult = (event) => {
+          let currentTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              currentTranscript += event.results[i][0].transcript;
+            } else {
+              currentTranscript += event.results[i][0].transcript;
+            }
+          }
+          setTranscript(currentTranscript);
+          
+          // If we have a final result, set it as input
+          if (event.results[event.results.length - 1].isFinal) {
+            setInput(currentTranscript.trim());
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+          setTranscript('');
+          // Show user-friendly error message
+          if (event.error === 'no-speech') {
+            console.log('No speech was detected. Please try again.');
+          } else if (event.error === 'network') {
+            console.log('Network error occurred. Please check your connection.');
+          } else if (event.error === 'not-allowed') {
+            console.log('Microphone access denied. Please allow microphone access.');
+          }
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+          setTranscript('');
+        };
+
+        setSpeechRecognition(recognition);
+      } else {
+        setIsVoiceSupported(false);
+        console.log('Speech recognition not supported');
+      }
+    }
+  }, []);
+
+  // Voice recognition functions
+  const startListening = () => {
+    if (speechRecognition && !isListening) {
+      try {
+        speechRecognition.start();
+      } catch (error) {
+        console.error('Error starting speech recognition:', error);
+      }
+    }
+  };
+
+  const stopListening = () => {
+    if (speechRecognition && isListening) {
+      speechRecognition.stop();
+    }
+  };
 
   // Clear messages when new prediction is made
   useEffect(() => {
@@ -179,9 +265,9 @@ const Chatbot = () => {
   };
 
   const quickActions = [
-    "Estimate price for 3 bedroom, 2 bathroom house around 2000 sqft",
-    "Show me waterfront properties with lake views and investment potential", 
-    "Compare properties under $600k with good investment ROI"
+    t('chatbot.quickActions') ? `${t('common.search')}: 3000 ${t('common.sqft')} house for family of 5 under 600k` : "Find a 3000 sqft house for a family of 5 under 600k",
+    `2 ${t('common.bedrooms')} apartment for family of 3 around 1500 ${t('common.sqft')}`, 
+    `${t('predict.form.predict')} ${t('common.price')} for family of 4 needing 3 ${t('common.bedrooms')} home`
   ];
 
   const PropertyCard = ({ property, onSelect }: { property: Property; onSelect: (property: Property) => void }) => (
@@ -194,15 +280,40 @@ const Chatbot = () => {
             <Home className="h-4 w-4 text-primary" />
             <span className="font-bold text-lg text-primary">{property.formatted_price}</span>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <Badge variant={property.confidence_score > 90 ? "default" : "secondary"} className="text-xs">
-              {property.confidence_score.toFixed(0)}% confident
-            </Badge>
-            {property.description && (
-              <Badge variant="outline" className="text-xs">
-                {property.description}
+          <div className="flex items-center gap-2">
+            <FavoriteButton 
+              houseId={property.id.toString()} 
+              houseData={{
+                id: property.id.toString(),
+                price: property.predicted_price,
+                bedrooms: property.bedrooms,
+                bathrooms: property.bathrooms,
+                living_area: property.living_area,
+                lot_area: 0, // Default value as Property interface doesn't have this
+                built_year: property.built_year,
+                grade: property.grade,
+                condition: property.condition,
+                latitude: 0, // Default value as Property interface doesn't have this
+                longitude: 0, // Default value as Property interface doesn't have this
+                waterfront: property.waterfront,
+                views: 0, // Default value as Property interface doesn't have this
+                schools_nearby: 0, // Default value as Property interface doesn't have this
+                distance_from_airport: 0 // Default value as Property interface doesn't have this
+              }}
+              variant="ghost" 
+              size="icon"
+              className="h-6 w-6 text-gray-500 hover:text-red-500"
+            />
+            <div className="flex flex-col items-end gap-1">
+              <Badge variant={property.confidence_score > 90 ? "default" : "secondary"} className="text-xs">
+                {property.confidence_score.toFixed(0)}% confident
               </Badge>
-            )}
+              {property.description && (
+                <Badge variant="outline" className="text-xs">
+                  {property.description}
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
         
@@ -260,9 +371,9 @@ const Chatbot = () => {
       <main className="flex-1 bg-muted/30">
         <div className="bg-gradient-to-r from-primary via-primary to-blue-600 text-primary-foreground py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold mb-4">🤖 AI Property Assistant</h1>
+            <h1 className="text-4xl font-bold mb-4">🤖 {t('chatbot.title')}</h1>
             <p className="text-xl text-primary-foreground/90 mb-2">
-              Get instant property valuations, smart recommendations, and expert investment advice
+              {t('chatbot.subtitle')}
             </p>
             <p className="text-sm text-primary-foreground/75">
               Powered by advanced AI • 95.97% accurate predictions • Real-time market analysis
@@ -280,7 +391,7 @@ const Chatbot = () => {
                   <div className="flex justify-between items-center p-4 border-b bg-muted/30">
                     <div className="flex items-center gap-2">
                       <Bot className="h-5 w-5 text-primary" />
-                      <h3 className="font-semibold">AI Property Assistant</h3>
+                      <h3 className="font-semibold">{t('chatbot.title')}</h3>
                       <Badge variant="outline" className="text-xs">
                         {messages.length - 1} messages
                       </Badge>
@@ -373,6 +484,11 @@ const Chatbot = () => {
                       <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
                         <span className="text-blue-500 mr-2">💡</span>
                         Popular searches to get you started:
+                        {isVoiceSupported && (
+                          <span className="ml-2 text-xs text-gray-500">
+                            🎙️ Try saying these phrases
+                          </span>
+                        )}
                       </p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -392,15 +508,67 @@ const Chatbot = () => {
 
                   {/* Input */}
                   <div className="p-6 border-t bg-white dark:bg-gray-900">
+                    {/* Voice transcript display */}
+                    {(isListening || transcript) && (
+                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            {isListening && (
+                              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                            )}
+                            <Mic className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-800">
+                              {isListening ? 'Listening...' : 'Voice Input Complete'}
+                            </span>
+                          </div>
+                          {isListening && (
+                            <Button 
+                              onClick={stopListening}
+                              size="sm"
+                              variant="outline"
+                              className="ml-auto text-xs h-6"
+                            >
+                              Stop
+                            </Button>
+                          )}
+                        </div>
+                        <p className="text-sm text-blue-700">
+                          {transcript || 'Speak now...'}
+                        </p>
+                      </div>
+                    )}
+                    
                     <div className="flex gap-3">
                       <Input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                        placeholder="🏠 Tell me what you're looking for... (e.g., '3 bedroom under 600k' or 'waterfront with good views')"
+                        placeholder={t('chatbot.placeholder')}
                         className="flex-1 py-3 text-sm border-2 focus:border-blue-400 transition-colors"
                         disabled={isTyping}
                       />
+                      
+                      {/* Voice Input Button */}
+                      {isVoiceSupported && (
+                        <Button 
+                          onClick={isListening ? stopListening : startListening}
+                          disabled={isTyping}
+                          variant={isListening ? "destructive" : "outline"}
+                          className={`px-4 py-3 transition-all duration-200 ${
+                            isListening 
+                              ? 'bg-red-600 hover:bg-red-700 animate-pulse' 
+                              : 'hover:bg-blue-50 hover:border-blue-400'
+                          }`}
+                          title={isListening ? 'Stop voice input' : 'Start voice input'}
+                        >
+                          {isListening ? (
+                            <MicOff className="h-4 w-4" />
+                          ) : (
+                            <Mic className="h-4 w-4" />
+                          )}
+                        </Button>
+                      )}
+                      
                       <Button 
                         onClick={handleSend} 
                         disabled={!input.trim() || isTyping}
@@ -415,6 +583,9 @@ const Chatbot = () => {
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
                       💡 Tip: Be specific about bedrooms, bathrooms, budget, and location for better results
+                      {isVoiceSupported && (
+                        <span className="ml-2">{t('chatbot.voiceHint')}</span>
+                      )}
                     </p>
                   </div>
                 </Card>
@@ -426,7 +597,7 @@ const Chatbot = () => {
                   <div className="p-4 border-b bg-muted/30">
                     <h3 className="text-lg font-semibold flex items-center gap-2">
                       <MapPin className="h-5 w-5 text-primary" />
-                      Property Results
+                      {t('chatbot.propertyResults')}
                     </h3>
                     {(() => {
                       const latestPredictions = [...messages].reverse().find(msg => msg.predictions && msg.predictions.length > 0)?.predictions;
@@ -500,7 +671,7 @@ const Chatbot = () => {
                       <div className="text-center">
                         <div className="flex items-center justify-center gap-2 mb-3">
                           <DollarSign className="h-4 w-4 text-primary" />
-                          <span className="font-semibold text-sm">Selected Property Details</span>
+                          <span className="font-semibold text-sm">{t('chatbot.selectedProperty')}</span>
                         </div>
                         <div className="bg-white rounded-lg p-3 mb-3">
                           <p className="text-lg font-bold text-primary">{selectedProperty.formatted_price}</p>
@@ -523,7 +694,7 @@ const Chatbot = () => {
                             setInput(`Tell me more about this ${selectedProperty.formatted_price} property with ${selectedProperty.bedrooms} bedrooms and ${selectedProperty.bathrooms} bathrooms. Is it a good investment? What are the pros and cons?`);
                           }}
                         >
-                          Ask AI about this property
+                          {t('chatbot.askAI')}
                         </Button>
                       </div>
                     </div>

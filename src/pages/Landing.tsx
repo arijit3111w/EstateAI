@@ -1,16 +1,23 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, TrendingUp, Map, MessageSquare, BarChart3, CheckCircle } from 'lucide-react';
+import { ArrowRight, TrendingUp, Map, MessageSquare, BarChart3, CheckCircle, Zap, Shield, Users, X, Star, Clock, Database, ChevronRight, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useLanguage } from '@/contexts/LanguageContext';
 import heroHome1 from '@/assets/hero-home-1.jpg';
 import heroHome2 from '@/assets/hero-home-2.jpg';
 import heroHome3 from '@/assets/hero-home-3.jpg';
+import analyticsImage from '@/assets/analytics-bg.jpg';
 import { useState, useEffect } from 'react';
+import React from 'react';
 
 const Landing = () => {
+  const { t } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedFeature, setSelectedFeature] = useState<number | null>(null);
   const slides = [heroHome1, heroHome2, heroHome3];
 
   useEffect(() => {
@@ -24,36 +31,136 @@ const Landing = () => {
     {
       icon: TrendingUp,
       title: 'AI Price Prediction',
-      description: '95.97% accurate predictions using advanced XGBoost ML model with 25 engineered features',
+      description: 'Advanced XGBoost ML model with 95.97% accuracy',
       link: '/predict',
+      modalContent: {
+        subtitle: 'Machine Learning-Powered Property Valuation',
+        detailedDescription: 'Our cutting-edge XGBoost machine learning model analyzes over 25 property features to deliver institutional-grade price predictions with 95.97% accuracy. Trained on 14,000+ property transactions, our AI considers location, amenities, market trends, and property characteristics.',
+        image: heroHome1,
+        features: [
+          { icon: Star, text: '95.97% prediction accuracy' },
+          { icon: Database, text: '25+ property features analyzed' },
+          { icon: TrendingUp, text: 'Real-time market trend integration' },
+          { icon: Clock, text: 'Instant valuation results' }
+        ],
+        benefits: [
+          'Get accurate property valuations in seconds',
+          'Make informed buying and selling decisions',
+          'Understand market positioning instantly',
+          'Access institutional-grade analytics'
+        ]
+      }
     },
     {
       icon: Map,
       title: 'Interactive Heatmap',
-      description: 'Visualize property prices across regions with color-coded heat maps',
+      description: 'Visualize property prices across regions',
       link: '/heatmap',
+      modalContent: {
+        subtitle: 'Geographic Property Value Visualization',
+        detailedDescription: 'Explore property values across different neighborhoods with our interactive heatmap. Visualize price trends, identify investment hotspots, and understand geographical patterns in the real estate market with color-coded pricing data.',
+        image: heroHome2,
+        features: [
+          { icon: Map, text: 'Interactive geographic visualization' },
+          { icon: TrendingUp, text: 'Price trend analysis by region' },
+          { icon: Star, text: 'Investment hotspot identification' },
+          { icon: Database, text: 'Real-time data updates' }
+        ],
+        benefits: [
+          'Discover undervalued neighborhoods',
+          'Track price appreciation trends',
+          'Compare regions at a glance',
+          'Plan investment strategies geographically'
+        ]
+      }
+    },
+    {
+      icon: Monitor,
+      title: 'Power BI Dashboard',
+      description: 'Interactive analytics and market insights',
+      link: '/dashboard',
+      modalContent: {
+        subtitle: 'Professional Market Intelligence Dashboard',
+        detailedDescription: 'Access our comprehensive Power BI dashboard featuring real-time market analytics, interactive visualizations, and professional-grade insights. Monitor market trends, analyze property performance, and make data-driven decisions with institutional-level reporting.',
+        image: analyticsImage,
+        features: [
+          { icon: BarChart3, text: 'Interactive Power BI visualizations' },
+          { icon: Database, text: 'Real-time market data integration' },
+          { icon: TrendingUp, text: 'Advanced trend analysis' },
+          { icon: Clock, text: '24/7 live data monitoring' }
+        ],
+        benefits: [
+          'Access professional-grade market analytics',
+          'Monitor real-time market performance',
+          'Generate comprehensive market reports',
+          'Identify investment opportunities instantly'
+        ]
+      }
     },
     {
       icon: BarChart3,
       title: 'Investment Analytics',
-      description: 'ROI calculator, rental income analyzer, and market timing advisor',
+      description: 'ROI calculator and market analysis tools',
       link: '/analytics',
+      modalContent: {
+        subtitle: 'Comprehensive Investment Intelligence',
+        detailedDescription: 'Analyze investment potential with our comprehensive analytics suite. Calculate ROI, assess market trends, compare property performance, and access detailed financial projections to make data-driven investment decisions.',
+        image: analyticsImage,
+        features: [
+          { icon: BarChart3, text: 'ROI and cash flow calculations' },
+          { icon: TrendingUp, text: 'Market trend analysis' },
+          { icon: Star, text: 'Performance benchmarking' },
+          { icon: Database, text: 'Historical data insights' }
+        ],
+        benefits: [
+          'Calculate precise investment returns',
+          'Understand market cycles and timing',
+          'Compare multiple investment options',
+          'Access professional-grade analytics'
+        ]
+      }
     },
     {
       icon: MessageSquare,
       title: 'AI Assistant',
-      description: '24/7 intelligent chatbot for personalized property recommendations',
+      description: '24/7 intelligent property recommendations',
       link: '/chatbot',
+      modalContent: {
+        subtitle: 'Your Personal Real Estate AI Advisor',
+        detailedDescription: 'Chat with our intelligent AI assistant for personalized property recommendations, market insights, and investment advice. Available 24/7, our AI understands your preferences and provides tailored guidance for your real estate journey.',
+        image: heroHome3,
+        features: [
+          { icon: MessageSquare, text: 'Natural language conversations' },
+          { icon: Clock, text: '24/7 availability' },
+          { icon: Star, text: 'Personalized recommendations' },
+          { icon: TrendingUp, text: 'Market insights and advice' }
+        ],
+        benefits: [
+          'Get instant answers to property questions',
+          'Receive personalized recommendations',
+          'Access expert advice anytime',
+          'Learn about market opportunities'
+        ]
+      }
     },
   ];
 
-  const benefits = [
-    '95.97% prediction accuracy',
-    '25 engineered features',
-    '99.7% predictions within 10%',
-    'Advanced location analysis',
-    'Comprehensive quality assessment',
-    'Market premium calculations',
+  const whyChooseUs = [
+    {
+      icon: Zap,
+      title: 'Lightning Fast',
+      description: 'Get instant property valuations within seconds ',
+    },
+    {
+      icon: Shield,
+      title: 'Data Privacy First',
+      description: 'Your information is secure with industry-standard encryption and privacy protocols',
+    },
+    {
+      icon: Users,
+      title: 'Continuously Improving',
+      description: 'Our AI model learns from market trends to provide increasingly accurate predictions',
+    },
   ];
 
   return (
@@ -74,7 +181,6 @@ const Landing = () => {
               alt={`Luxury property ${index + 1}`}
               className="w-full h-full object-cover"
             />
-            {/* Professional overlay with subtle gradient */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </div>
@@ -82,40 +188,37 @@ const Landing = () => {
         
         <div className="relative container mx-auto px-4 h-full flex items-center">
           <div className="max-w-3xl text-white">
-            {/* Professional badge */}
             <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-6">
               <TrendingUp className="h-4 w-4 mr-2 text-emerald-400" />
-              <span className="text-sm font-medium">95.97% Prediction Accuracy</span>
+              <span className="text-sm font-medium">{t('landing.features.accuracy')}: 95.97%</span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Professional
+              {t('landing.title')}
               <span className="bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent block">
-                Real Estate AI
+                AI Platform
               </span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-white/90 font-light leading-relaxed">
-              Advanced machine learning algorithms deliver institutional-grade property valuations 
-              with unparalleled accuracy and market insights.
+              {t('landing.description')}
             </p>
             
-            {/* Professional CTA buttons */}
             <div className="flex flex-wrap gap-4 mb-8">
               <Link to="/predict">
                 <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg font-semibold">
-                  Get Property Valuation
+                  {t('landing.getStarted')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/chatbot">
                 <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm text-white border-white/30 hover:bg-white/20 hover:border-white/50 transition-all duration-300 px-8 py-4 text-lg font-semibold">
                   <MessageSquare className="mr-2 h-5 w-5" />
-                  Ask AI Assistant
+                  {t('nav.chatbot')}
                 </Button>
               </Link>
             </div>
             
-            {/* Professional stats */}
+            {/* Key Stats - Only shown once */}
             <div className="grid grid-cols-3 gap-8 py-6 px-8 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
               <div className="text-center">
                 <div className="text-2xl font-bold text-emerald-400">99.7%</div>
@@ -131,7 +234,6 @@ const Landing = () => {
               </div>
             </div>
             
-            {/* Elegant indicators */}
             <div className="flex gap-3 mt-8">
               {slides.map((_, index) => (
                 <button
@@ -147,41 +249,9 @@ const Landing = () => {
             </div>
           </div>
         </div>
-        
-        {/* Professional floating card */}
-        <div className="absolute right-8 top-1/2 transform -translate-y-1/2 hidden lg:block">
-          <Card className="p-6 bg-white/95 backdrop-blur-md shadow-2xl border-0 w-80">
-            <div className="text-center mb-4">
-              <div className="h-12 w-12 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center mx-auto mb-3">
-                <BarChart3 className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-bold text-gray-900">Live Market Insights</h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Average Price/SqFt</span>
-                <span className="font-semibold text-emerald-600">$245</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Market Trend</span>
-                <div className="flex items-center text-emerald-600">
-                  <TrendingUp className="h-4 w-4 mr-1" />
-                  <span className="font-semibold">+5.2%</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Properties Sold</span>
-                <span className="font-semibold text-gray-900">1,247</span>
-              </div>
-            </div>
-            <Button className="w-full mt-4 bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:from-emerald-600 hover:to-blue-600">
-              View Full Report
-            </Button>
-          </Card>
-        </div>
       </section>
 
-      {/* Features Grid */}
+      {/* Features Section */}
       <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
@@ -190,7 +260,7 @@ const Landing = () => {
               Professional Real Estate Solutions
             </div>
             <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-              Advanced AI-Powered Features
+              AI-Powered Features
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Leverage cutting-edge artificial intelligence for comprehensive property analysis, 
@@ -198,73 +268,126 @@ const Landing = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <Link key={index} to={feature.link}>
-                  <Card className="group p-8 h-full hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-0 bg-white/80 backdrop-blur-sm relative overflow-hidden">
-                    {/* Gradient background on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
-                    <div className="relative z-10">
-                      <div className="h-16 w-16 rounded-2xl bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                        <Icon className="h-8 w-8 text-white" />
-                      </div>
-                      <h3 className="text-2xl font-bold mb-4 text-gray-900 group-hover:text-emerald-600 transition-colors duration-300">
-                        {feature.title}
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
-                        {feature.description}
-                      </p>
-                      
-                      {/* Arrow indicator */}
-                      <div className="flex items-center mt-6 text-emerald-600 font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
-                        <span className="mr-2">Explore</span>
-                        <ArrowRight className="h-4 w-4" />
-                      </div>
+                <Card 
+                  key={index} 
+                  className="group p-8 h-full hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-0 bg-white/80 backdrop-blur-sm relative overflow-hidden"
+                  onClick={() => setSelectedFeature(index)}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  
+                  <div className="relative z-10">
+                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                      <Icon className="h-8 w-8 text-white" />
                     </div>
-                  </Card>
-                </Link>
+                    <h3 className="text-2xl font-bold mb-4 text-gray-900 group-hover:text-emerald-600 transition-colors duration-300">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                      {feature.description}
+                    </p>
+                    
+                    <div className="flex items-center mt-6 text-emerald-600 font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
+                      <span className="mr-2">Learn More</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </div>
+                  </div>
+                </Card>
               );
             })}
+          </div>
+
+          {/* Live Market Insights Card - Repositioned */}
+          <div className="mt-16 flex justify-center">
+            <Card className="p-8 bg-gradient-to-br from-white to-gray-50 shadow-2xl border-0 w-full max-w-4xl">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                <div className="lg:col-span-1">
+                  <div className="h-16 w-16 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center mb-4">
+                    <BarChart3 className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Live Market Insights</h3>
+                  <p className="text-gray-600">Real-time data from the property market</p>
+                </div>
+                
+                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                    <div className="text-sm text-gray-600 mb-1">Average Price/SqFt</div>
+                    <div className="text-2xl font-bold text-emerald-600">$245</div>
+                  </div>
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                    <div className="text-sm text-gray-600 mb-1">Market Trend</div>
+                    <div className="flex items-center justify-center text-emerald-600">
+                      <TrendingUp className="h-5 w-5 mr-1" />
+                      <span className="text-2xl font-bold">+5.2%</span>
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-white rounded-xl shadow-sm">
+                    <div className="text-sm text-gray-600 mb-1">Properties Listed</div>
+                    <div className="text-2xl font-bold text-gray-900">1,247</div>
+                  </div>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
+      {/* Why Choose Us Section */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="relative">
+              <img 
+                src={heroHome2} 
+                alt="Modern property" 
+                className="rounded-3xl shadow-2xl object-cover w-full h-[500px]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-3xl"></div>
+              <div className="absolute bottom-8 left-8 text-white">
+                <h4 className="text-2xl font-bold mb-2">Professional Analysis</h4>
+                <p className="text-white/90">Get detailed property insights with our AI</p>
+              </div>
+            </div>
+            
             <div>
               <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-6">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Trusted by Real Estate Professionals
+                <Shield className="h-4 w-4 mr-2" />
+                Why Choose Value Home Vision
               </div>
               
               <h2 className="text-5xl font-bold mb-6 text-gray-900 leading-tight">
-                Why Choose Our
+                Transform Your
                 <span className="bg-gradient-to-r from-emerald-500 to-blue-500 bg-clip-text text-transparent block">
-                  AI Platform?
+                  Real Estate Decisions
                 </span>
               </h2>
               <p className="text-xl text-gray-600 mb-10 leading-relaxed">
                 Our institutional-grade AI delivers the accuracy and insights you need 
-                for confident real estate decisions, backed by advanced machine learning 
-                and comprehensive market data.
+                for confident real estate decisions.
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-start gap-4 group">
-                    <div className="flex-shrink-0 h-6 w-6 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-center mt-0.5">
-                      <CheckCircle className="h-4 w-4 text-white" />
+              <div className="space-y-8 mb-10">
+                {whyChooseUs.map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={index} className="flex items-start gap-6 group">
+                      <div className="flex-shrink-0 h-12 w-12 rounded-2xl bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center">
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors duration-200">
+                          {item.title}
+                        </h4>
+                        <p className="text-gray-600 leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
-                    <span className="text-gray-700 font-medium group-hover:text-emerald-600 transition-colors duration-200">
-                      {benefit}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               
               <div className="flex flex-wrap gap-4">
@@ -281,36 +404,12 @@ const Landing = () => {
                 </Link>
               </div>
             </div>
-            
-            <div className="grid grid-cols-2 gap-6">
-              <Card className="p-8 text-center bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 hover:shadow-lg transition-all duration-300">
-                <div className="text-5xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent mb-3">95.97%</div>
-                <div className="text-sm font-medium text-emerald-700">Model Accuracy</div>
-                <div className="text-xs text-emerald-600 mt-1">Industry Leading</div>
-              </Card>
-              <Card className="p-8 text-center bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-all duration-300">
-                <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-3">99.7%</div>
-                <div className="text-sm font-medium text-blue-700">Within 10%</div>
-                <div className="text-xs text-blue-600 mt-1">Precision Rate</div>
-              </Card>
-              <Card className="p-8 text-center bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-all duration-300">
-                <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent mb-3">25</div>
-                <div className="text-sm font-medium text-purple-700">AI Features</div>
-                <div className="text-xs text-purple-600 mt-1">Advanced Analysis</div>
-              </Card>
-              <Card className="p-8 text-center bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-all duration-300">
-                <div className="text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-3">14K+</div>
-                <div className="text-sm font-medium text-orange-700">Properties</div>
-                <div className="text-xs text-orange-600 mt-1">Database Size</div>
-              </Card>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Final CTA Section */}
       <section className="py-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white relative overflow-hidden">
-        {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-blue-500/20" />
           <div className="grid grid-cols-6 gap-4 transform rotate-12 scale-150">
@@ -323,55 +422,157 @@ const Landing = () => {
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="max-w-4xl mx-auto">
             <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-              <TrendingUp className="h-5 w-5 mr-3 text-emerald-400" />
-              <span className="text-lg font-medium">Ready to Transform Your Real Estate Business?</span>
+              <CheckCircle className="h-5 w-5 mr-3 text-emerald-400" />
+              <span className="text-lg font-medium">Join 1000+ Real Estate Professionals</span>
             </div>
             
             <h2 className="text-6xl font-bold mb-8 leading-tight">
-              Start Your
+              Ready to Transform
               <span className="bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent block">
-                AI-Powered Journey
+                Your Business?
               </span>
             </h2>
             
             <p className="text-xl mb-12 text-white/80 max-w-3xl mx-auto leading-relaxed">
-              Join thousands of real estate professionals who trust our AI platform for accurate 
-              property valuations, market insights, and investment analysis.
+              Experience the power of AI-driven real estate insights. Start using our platform today 
+              and discover why professionals trust our technology.
             </p>
             
-            <div className="flex flex-wrap gap-6 justify-center mb-12">
-              <Link to="/predict">
-                <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 px-10 py-5 text-lg font-semibold">
-                  Get Free Valuation
-                  <ArrowRight className="ml-3 h-6 w-6" />
+            {/* Email Signup Form */}
+            <div className="max-w-md mx-auto mb-12">
+              <div className="flex gap-4 p-2 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+                <input 
+                  type="email" 
+                  placeholder="Enter your email address"
+                  className="flex-1 px-4 py-3 bg-transparent text-white placeholder-white/60 border-0 focus:outline-none"
+                />
+                <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold whitespace-nowrap">
+                  Get Started Free
                 </Button>
-              </Link>
-              <Link to="/chatbot">
-                <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-sm text-white border-white/30 hover:bg-white/20 hover:border-white/50 transition-all duration-300 px-10 py-5 text-lg font-semibold">
-                  <MessageSquare className="mr-3 h-6 w-6" />
-                  Talk to AI Assistant
-                </Button>
-              </Link>
+              </div>
+              <p className="text-sm text-white/60 mt-3">Completely free to use </p>
             </div>
             
-            {/* Trust indicators */}
+            {/* Trust indicators - Different content */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-white/20">
               <div className="text-center">
-                <div className="text-3xl font-bold text-emerald-400 mb-2">24/7</div>
-                <div className="text-white/70">AI Assistant Available</div>
+                <div className="text-3xl font-bold text-emerald-400 mb-2">100%</div>
+                <div className="text-white/70">Satisfaction Guarantee</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-2">Instant</div>
-                <div className="text-white/70">Property Analysis</div>
+                <div className="text-3xl font-bold text-blue-400 mb-2">100%</div>
+                <div className="text-white/70">Free Platform</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-400 mb-2">Free</div>
-                <div className="text-white/70">Initial Consultation</div>
+                <div className="text-3xl font-bold text-purple-400 mb-2">24/7</div>
+                <div className="text-white/70">Expert Support</div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Feature Modal */}
+      <Dialog open={selectedFeature !== null} onOpenChange={() => setSelectedFeature(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          {selectedFeature !== null && (
+            <div className="relative">
+              {/* Modal Header with Image */}
+              <div className="relative h-64 overflow-hidden">
+                <img 
+                  src={features[selectedFeature].modalContent.image}
+                  alt={features[selectedFeature].title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                
+                {/* Feature Icon */}
+                <div className="absolute top-6 left-6">
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center shadow-xl">
+                    {React.createElement(features[selectedFeature].icon, { className: "h-8 w-8 text-white" })}
+                  </div>
+                </div>
+                
+                {/* Title Overlay */}
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <h2 className="text-3xl font-bold mb-2">{features[selectedFeature].title}</h2>
+                  <p className="text-lg text-white/90">{features[selectedFeature].modalContent.subtitle}</p>
+                </div>
+              </div>
+              
+              {/* Modal Content */}
+              <div className="p-8">
+                {/* Description */}
+                <div className="mb-8">
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    {features[selectedFeature].modalContent.detailedDescription}
+                  </p>
+                </div>
+                
+                {/* Features Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  {/* Key Features */}
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                      <Star className="h-5 w-5 text-emerald-500 mr-2" />
+                      Key Features
+                    </h3>
+                    <div className="space-y-3">
+                      {features[selectedFeature].modalContent.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          {React.createElement(feature.icon, { className: "h-5 w-5 text-emerald-500 flex-shrink-0" })}
+                          <span className="text-gray-700">{feature.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Benefits */}
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                      <CheckCircle className="h-5 w-5 text-blue-500 mr-2" />
+                      Benefits
+                    </h3>
+                    <div className="space-y-3">
+                      {features[selectedFeature].modalContent.benefits.map((benefit, idx) => (
+                        <div key={idx} className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+                          <CheckCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-gray-700">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+                  <Link to={features[selectedFeature].link} className="flex-1">
+                    <Button className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-3 text-lg font-semibold">
+                      Try {features[selectedFeature].title}
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 border-2 border-gray-300 text-gray-700 hover:border-emerald-500 hover:text-emerald-600 py-3 text-lg font-semibold"
+                    onClick={() => setSelectedFeature(null)}
+                  >
+                    Close
+                  </Button>
+                </div>
+                
+                {/* Trust Badge */}
+                <div className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-lg border border-emerald-200">
+                  <div className="flex items-center justify-center gap-2 text-emerald-700">
+                    <Shield className="h-5 w-5" />
+                    <span className="font-medium">Trusted by 1000+ Real Estate Professionals</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

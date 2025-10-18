@@ -42,6 +42,7 @@ model_metadata = None
 feature_engineering_info = None
 
 def load_model_artifacts():
+
     """Load the advanced XGBoost model and preprocessing artifacts"""
     global model, scaler, selected_features, model_metadata, feature_engineering_info
     
@@ -686,92 +687,202 @@ def get_key_value_drivers_advanced(features: HouseFeatures, luxury_score: float,
     return drivers if drivers else ["Standard features"]
 
 def extract_property_features(message: str) -> PropertyQuery:
-    """Extract property features from natural language using Gemini AI"""
+    """Extract property features from natural language using enhanced pattern matching and Gemini AI"""
     try:
-        if gemini_model is None:
-            logger.info("Using fallback feature extraction")
-            # Fallback: Simple keyword extraction
-            features = {}
-            message_lower = message.lower()
-            
-            # Extract bedrooms
-            bedroom_match = re.search(r'(\d+)\s*(?:bed|bedroom)', message_lower)
+        message_lower = message.lower()
+        
+        # Enhanced pattern matching for better feature extraction
+        features = {}
+        
+        # Extract area with multiple patterns
+        area_patterns = [
+            r'(\d+(?:,\d{3})*)\s*(?:sqft|sq\.?\s*ft|square\s*feet?)',
+            r'(\d+(?:,\d{3})*)\s*(?:sq|square)\s*(?:ft|feet?)',
+            r'area\s*(?:of\s*)?(\d+(?:,\d{3})*)',
+            r'(\d+(?:,\d{3})*)\s*square',
+            r'around\s*(\d+(?:,\d{3})*)\s*(?:sqft|sq\.?\s*ft|square\s*feet?)',
+            r'about\s*(\d+(?:,\d{3})*)\s*(?:sqft|sq\.?\s*ft|square\s*feet?)'
+        ]
+        
+        for pattern in area_patterns:
+            area_match = re.search(pattern, message_lower)
+            if area_match:
+                # Remove commas and convert to float
+                area_str = area_match.group(1).replace(',', '')
+                features['living_area'] = float(area_str)
+                # Also set lot_area to a reasonable default (4x living area)
+                features['lot_area'] = float(area_str) * 4
+                break
+        
+        # Extract bedrooms with enhanced patterns
+        bedroom_patterns = [
+            r'(\d+)\s*(?:bed|bedroom)s?',
+            r'(\d+)\s*br\b',
+            r'(\d+)\s*b\s*/?r',
+            r'family\s*of\s*(\d+)',  # Family size patterns
+            r'(\d+)\s*people',
+            r'(\d+)\s*person'
+        ]
+        
+        for pattern in bedroom_patterns:
+            bedroom_match = re.search(pattern, message_lower)
             if bedroom_match:
-                features['number_of_bedrooms'] = int(bedroom_match.group(1))
-            
-            # Extract bathrooms
-            bathroom_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:bath|bathroom)', message_lower)
+                number = int(bedroom_match.group(1))
+                # If it's a family size, estimate bedrooms realistically
+                if 'family' in pattern or 'people' in pattern or 'person' in pattern:
+                    if number <= 2:
+                        features['number_of_bedrooms'] = 1  # Couple or single person - 1 bedroom
+                        features['number_of_bathrooms'] = 1.0
+                    elif number <= 3:
+                        features['number_of_bedrooms'] = 2  # Small family - 2 bedrooms
+                        features['number_of_bathrooms'] = 1.5
+                    elif number <= 5:
+                        features['number_of_bedrooms'] = 3  # Medium family - 3 bedrooms max
+                        features['number_of_bathrooms'] = 2.0
+                    elif number <= 7:
+                        features['number_of_bedrooms'] = 3  # Large family - still 3 bedrooms
+                        features['number_of_bathrooms'] = 2.5
+                    else:
+                        features['number_of_bedrooms'] = 4  # Very large family - 4 bedrooms max
+                        features['number_of_bathrooms'] = 3.0
+                else:
+                    features['number_of_bedrooms'] = number
+                break
+        
+        # Extract bathrooms with enhanced patterns
+        bathroom_patterns = [
+            r'(\d+(?:\.\d+)?)\s*(?:bath|bathroom)s?',
+            r'(\d+(?:\.\d+)?)\s*ba\b',
+            r'(\d+(?:\.\d+)?)\s*b\s*/?a'
+        ]
+        
+        for pattern in bathroom_patterns:
+            bathroom_match = re.search(pattern, message_lower)
             if bathroom_match:
                 features['number_of_bathrooms'] = float(bathroom_match.group(1))
-            
-            # Extract square footage
-            sqft_match = re.search(r'(\d+)\s*(?:sqft|sq ft|square feet)', message_lower)
-            if sqft_match:
-                features['living_area'] = float(sqft_match.group(1))
-            
-            # Extract budget
-            budget_match = re.search(r'under\s*(\d+)k', message_lower)
+                break
+        
+        # Extract budget with enhanced patterns
+        budget_patterns = [
+            r'under\s*(?:\$)?(\d+(?:,\d{3})*)\s*(?:k|thousand)',
+            r'below\s*(?:\$)?(\d+(?:,\d{3})*)\s*(?:k|thousand)',
+            r'less\s*than\s*(?:\$)?(\d+(?:,\d{3})*)\s*(?:k|thousand)',
+            r'budget\s*(?:of\s*)?(?:\$)?(\d+(?:,\d{3})*)\s*(?:k|thousand)',
+            r'(\d+(?:,\d{3})*)\s*(?:k|thousand)\s*(?:budget|range|max)',
+            r'up\s*to\s*(?:\$)?(\d+(?:,\d{3})*)\s*(?:k|thousand)'
+        ]
+        
+        for pattern in budget_patterns:
+            budget_match = re.search(pattern, message_lower)
             if budget_match:
-                features['budget_range'] = f"under {budget_match.group(1)}k"
-            
-            # Extract waterfront
-            if 'waterfront' in message_lower:
-                features['waterfront_present'] = 1
-            
-            logger.info(f"Extracted features: {features}")
-            return PropertyQuery(**features)
+                budget_value = budget_match.group(1).replace(',', '')
+                features['budget_range'] = f"under {budget_value}k"
+                break
         
-        prompt = f"""
-        Extract property features from this message: "{message}"
+        # Extract property quality indicators
+        if any(word in message_lower for word in ['luxury', 'premium', 'high-end', 'upscale']):
+            features['grade_of_house'] = 10
+            features['condition_of_house'] = 4
+        elif any(word in message_lower for word in ['good quality', 'well-maintained', 'nice']):
+            features['grade_of_house'] = 8
+            features['condition_of_house'] = 4
+        elif any(word in message_lower for word in ['average', 'standard', 'normal']):
+            features['grade_of_house'] = 7
+            features['condition_of_house'] = 3
+        elif any(word in message_lower for word in ['budget', 'affordable', 'basic']):
+            features['grade_of_house'] = 6
+            features['condition_of_house'] = 3
         
-        Please identify and extract the following property features if mentioned:
-        - Number of bedrooms (e.g., "3 bedroom", "3 bed", "3BR")
-        - Number of bathrooms (e.g., "2 bathroom", "2 bath", "2BA")
-        - Living area in square feet (e.g., "2000 sqft", "2000 sq ft", "2000 square feet")
-        - Lot area in square feet 
-        - Grade of house (1-13 scale, where 7-8 is average, 9-11 is good, 12-13 is excellent)
-        - Basement area
-        - Area excluding basement
-        - Number of views (0-4)
-        - Waterfront (yes=1, no=0)
-        - Condition (1-5 scale, where 3 is average, 4-5 is good)
-        - Built year
-        - Renovation year
-        - Number of schools nearby
-        - Distance from airport
-        - Budget range (e.g., "under 500k", "500k-800k", "800k-1.2M", "over 1.2M")
-        - Postal code
+        # Extract waterfront/views
+        if any(word in message_lower for word in ['waterfront', 'water view', 'lakefront', 'beachfront']):
+            features['waterfront_present'] = 1
+            features['number_of_views'] = 4
+        elif any(word in message_lower for word in ['view', 'views', 'scenic']):
+            features['number_of_views'] = 2
         
-        Return ONLY a JSON object with extracted values or null for missing values:
-        {{
-            "living_area": 2000,
-            "number_of_bedrooms": 3,
-            "number_of_bathrooms": 2,
-            "grade_of_house": 8,
-            "budget_range": "500k-800k",
-            "waterfront_present": 0,
-            "condition_of_house": 3,
-            "built_year": 2020,
-            "number_of_views": 2
-        }}
-        """
+        # Extract age/year information
+        year_patterns = [
+            r'built\s*(?:in\s*)?(\d{4})',
+            r'(\d{4})\s*built',
+            r'new\s*construction',
+            r'newly\s*built'
+        ]
         
-        response = gemini_model.generate_content(prompt)
+        for pattern in year_patterns:
+            year_match = re.search(pattern, message_lower)
+            if year_match:
+                if 'new' in pattern:
+                    features['built_year'] = 2023
+                else:
+                    features['built_year'] = int(year_match.group(1))
+                break
         
-        # Parse JSON from response
-        json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
-        if json_match:
-            extracted_data = json.loads(json_match.group())
-            return PropertyQuery(**{k: v for k, v in extracted_data.items() if v is not None})
-        else:
-            return PropertyQuery()
-            
+        # Extract location information
+        location_patterns = [
+            r'postal\s*code\s*(\d+)',
+            r'zip\s*code\s*(\d+)',
+            r'area\s*code\s*(\d+)',
+            r'(\d{5,6})\s*(?:area|postal|zip)'
+        ]
+        
+        for pattern in location_patterns:
+            location_match = re.search(pattern, message_lower)
+            if location_match:
+                features['postal_code'] = int(location_match.group(1))
+                break
+        
+        logger.info(f"Enhanced extraction found features: {features}")
+        
+        # Try Gemini AI for additional extraction if available
+        if gemini_model is not None:
+            try:
+                prompt = f"""
+                Extract property features from this message: "{message}"
+                
+                Focus on these key features:
+                - Living area in square feet (look for patterns like "3000 sqft", "2500 square feet", "around 2000 sq ft")
+                - Family size patterns (like "family of 3", "family of 5") and convert to realistic bedrooms/bathrooms:
+                  * 1-2 people: 1 bedroom, 1 bathroom
+                  * Family of 3: 2 bedrooms, 1.5 bathrooms
+                  * Family of 4-5: 3 bedrooms, 2 bathrooms
+                  * Family of 6-7: 3-4 bedrooms, 2.5 bathrooms maximum
+                - Number of bedrooms and bathrooms (when explicitly mentioned)
+                - Budget constraints (under 500k, etc.)
+                - Property quality indicators
+                - Special features (waterfront, views, etc.)
+                
+                Return ONLY a JSON object with extracted values:
+                {{
+                    "living_area": 3000,
+                    "number_of_bedrooms": 3,
+                    "number_of_bathrooms": 2,
+                    "grade_of_house": 8,
+                    "budget_range": "under 600k",
+                    "waterfront_present": 0
+                }}
+                """
+                
+                response = gemini_model.generate_content(prompt)
+                json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
+                if json_match:
+                    gemini_data = json.loads(json_match.group())
+                    # Merge Gemini results with pattern matching results
+                    for key, value in gemini_data.items():
+                        if value is not None and key not in features:
+                            features[key] = value
+                    logger.info(f"Gemini enhanced features: {features}")
+            except Exception as gemini_error:
+                logger.warning(f"Gemini extraction failed, using pattern matching: {gemini_error}")
+        
+        return PropertyQuery(**{k: v for k, v in features.items() if v is not None})
+        
     except Exception as e:
         logger.error(f"Feature extraction error: {str(e)}")
-        # Always fall back to keyword extraction on any error
+        # Always fall back to basic pattern matching
         features = {}
         message_lower = message.lower()
         
+        # Basic fallback patterns
         bedroom_match = re.search(r'(\d+)\s*(?:bed|bedroom)', message_lower)
         if bedroom_match:
             features['number_of_bedrooms'] = int(bedroom_match.group(1))
@@ -779,6 +890,11 @@ def extract_property_features(message: str) -> PropertyQuery:
         bathroom_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:bath|bathroom)', message_lower)
         if bathroom_match:
             features['number_of_bathrooms'] = float(bathroom_match.group(1))
+        
+        sqft_match = re.search(r'(\d+(?:,\d{3})*)\s*(?:sqft|sq ft|square feet)', message_lower)
+        if sqft_match:
+            area_str = sqft_match.group(1).replace(',', '')
+            features['living_area'] = float(area_str)
         
         if 'waterfront' in message_lower:
             features['waterfront_present'] = 1
@@ -1039,36 +1155,49 @@ def generate_general_response(message: str, context: Dict) -> str:
     """Generate general conversational responses"""
     try:
         if gemini_model is None:
-            # Fallback responses based on keywords
+            # Enhanced fallback responses based on keywords
             message_lower = message.lower()
             
             if any(word in message_lower for word in ['price', 'cost', 'value', 'worth']):
-                return "I can help you estimate property prices! Please tell me about the property features like number of bedrooms, bathrooms, square footage, and any special features like waterfront or views."
+                return "I can help you estimate property prices! Please tell me about the property features like number of bedrooms, bathrooms, square footage (e.g., '3000 sqft'), family size (e.g., 'family of 4'), and any special features like waterfront or views."
+            
+            elif any(word in message_lower for word in ['family', 'people', 'person']):
+                return "Great! I can help you find properties based on family size. For realistic sizing: 1-2 people need 1 bedroom, family of 3 needs 2 bedrooms, family of 4-5 needs 3 bedrooms, and family of 6-7 needs 3-4 bedrooms maximum. Just tell me your family size and I'll estimate appropriate space and pricing."
+            
+            elif any(word in message_lower for word in ['sqft', 'square feet', 'sq ft', 'area']):
+                return "Perfect! I can work with area specifications. You can say things like '4000 sqft house', '3500 square feet property', or 'around 2500 sq ft home' and I'll provide accurate price estimates and recommendations."
             
             elif any(word in message_lower for word in ['invest', 'investment', 'roi', 'return']):
-                return "For investment advice, I can analyze properties based on their potential ROI, rental yield, and market trends. Share your budget and property preferences, and I'll help you find the best investment opportunities."
+                return "For investment advice, I can analyze properties based on their potential ROI, rental yield, and market trends. Share your budget and property preferences (including area size and family requirements), and I'll help you find the best investment opportunities."
             
             elif any(word in message_lower for word in ['location', 'area', 'neighborhood', 'where']):
-                return "Location is crucial for property values! I can analyze different postal codes and their market ratings. Tell me about your preferred areas or budget range, and I'll help you find suitable locations."
+                return "Location is crucial for property values! I can analyze different postal codes and their market ratings. Tell me about your preferred areas, budget range, and space requirements (like '4000 sqft for family of 5'), and I'll help you find suitable locations."
             
             elif any(word in message_lower for word in ['compare', 'comparison', 'which', 'better', 'best']):
-                return "I can compare multiple properties for you! Share details about the properties you're considering, and I'll analyze them based on price, location, size, quality, and investment potential."
+                return "I can compare multiple properties for you! Share details about the properties you're considering (including square footage and family size needs), and I'll analyze them based on price, location, size, quality, and investment potential."
             
             else:
-                return "I'm here to help you with property valuations and real estate advice. You can ask me to estimate prices, compare properties, or get investment recommendations. Just tell me what you're looking for - like '3 bedroom house under 600k' or 'waterfront property with good views'!"
+                return "I'm here to help you with property valuations and real estate advice. You can ask me things like: '3000 sqft house for family of 5' (3 bedrooms), '2 bedroom property for family of 3', or 'couple needs 1 bedroom apartment under 400k'. I understand both specific measurements and realistic family size requirements!"
         
         prompt = f"""
         You are a knowledgeable real estate AI assistant. A user said: "{message}"
         
         Context: {context}
         
-        Respond helpfully about real estate topics. If they're asking about property features, encourage them to be specific about:
-        - Number of bedrooms and bathrooms
-        - Square footage / living area
-        - Property grade or quality
-        - Location preferences
-        - Budget range
-        - Special features (waterfront, views, etc.)
+        Respond helpfully about real estate topics. You specialize in understanding:
+        - Area specifications (4000 sqft, 3500 square feet, etc.)
+        - Family size requirements (family of 3, family of 5, etc.) and converting to appropriate bedrooms/bathrooms
+        - Budget constraints and price ranges
+        - Property features and quality indicators
+        
+        If they're asking about property features, encourage them to be specific about:
+        - Square footage or living area (e.g., "3000 sqft", "around 2500 square feet")
+        - Family size (e.g., "family of 4", "5 people") which helps estimate room needs realistically:
+          * 1-2 people: 1 bedroom
+          * Family of 3: 2 bedrooms  
+          * Family of 4-5: 3 bedrooms
+          * Family of 6-7: 3-4 bedrooms maximum
+        - Budget range and special features
         
         Keep responses under 100 words and always be helpful and professional.
         """
@@ -1078,7 +1207,7 @@ def generate_general_response(message: str, context: Dict) -> str:
         
     except Exception as e:
         logger.error(f"General response generation error: {str(e)}")
-        return "I'm here to help you with property valuations and real estate advice. Please tell me about the type of property you're looking for (bedrooms, bathrooms, size, location, etc.) and I'll provide price estimates and recommendations."
+        return "I'm here to help you with property valuations and real estate advice. You can specify area requirements like '4000 sqft house' or family needs like 'family of 5' and I'll provide appropriate price estimates and room recommendations."
 
 if __name__ == "__main__":
     import uvicorn

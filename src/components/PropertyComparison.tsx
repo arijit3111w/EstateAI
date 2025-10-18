@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { usePrediction } from '@/contexts/PredictionContext';
+import FavoriteButton from './FavoriteButton';
 import { TrendingUp, DollarSign, Home, Award, Calculator, Eye, Star } from 'lucide-react';
 
 interface PropertyComparison {
@@ -297,6 +298,29 @@ const PropertyComparisonComponent: React.FC<PropertyComparisonProps> = ({
                   #{index + 1}
                 </Badge>
                 {index === 0 && <Star className="h-4 w-4 text-yellow-500 fill-current" />}
+                <FavoriteButton 
+                  houseId={item.property.id} 
+                  houseData={{
+                    id: item.property.id,
+                    price: item.property.price,
+                    bedrooms: item.property.bedrooms,
+                    bathrooms: item.property.bathrooms,
+                    living_area: item.property.living_area,
+                    lot_area: item.property.lot_area,
+                    built_year: item.property.built_year,
+                    grade: item.property.grade,
+                    condition: item.property.condition,
+                    latitude: item.property.latitude,
+                    longitude: item.property.longitude,
+                    waterfront: item.property.waterfront,
+                    views: item.property.views,
+                    schools_nearby: item.property.schools_nearby,
+                    distance_from_airport: item.property.distance_from_airport
+                  }}
+                  variant="ghost" 
+                  size="icon"
+                  className="h-6 w-6 text-gray-500 hover:text-red-500"
+                />
               </div>
               <div className="text-right">
                 <div className="text-xl font-bold text-blue-700">

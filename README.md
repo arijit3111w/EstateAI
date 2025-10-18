@@ -204,6 +204,18 @@ GEMINI_API_KEY=your_actual_gemini_api_key
 3. Compare different properties
 4. View market trends and insights
 
+## 🛠️ Troubleshooting Model Artifact Errors
+
+If you encounter errors when running the backend (such as issues loading model artifacts with joblib), check the following:
+
+1. **File Presence**: Ensure all files in `backend/model/artifacts_v2/` are present after cloning. If any are missing, re-clone or download them from the repository.
+2. **Correct Path**: Verify the code is loading model files from the correct path. Paths may differ depending on your operating system or working directory.
+3. **File Integrity**: Make sure the `.joblib` and `.json` files are not corrupted. Try re-downloading if you suspect corruption.
+4. **Python & Library Versions**: Use the same Python version (3.12) and library versions (joblib, scikit-learn, xgboost, etc.) as specified in `requirements.txt`.
+5. **Permissions**: Ensure you have read permissions for the artifact files.
+
+If problems persist, please open an issue with the full error traceback and details about your environment.
+
 ## 📚 API Documentation
 
 ### Core Endpoints

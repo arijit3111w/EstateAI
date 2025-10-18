@@ -1,5 +1,3 @@
-/// <reference types="vite/client" />
-
 // Web Speech API TypeScript declarations
 declare global {
   interface Window {
@@ -88,3 +86,5 @@ interface SpeechGrammar {
   src: string;
   weight: number;
 }
+
+export {};

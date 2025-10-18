@@ -7,10 +7,12 @@ import RelatedHouses from '@/components/RelatedHouses';
 import PropertyMap from '@/components/PropertyMap';
 import { PredictionResponse, PropertyFeatures } from '@/types/property';
 import { usePrediction } from '@/contexts/PredictionContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Card } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
 const Predict = () => {
+  const { t } = useLanguage();
   const { 
     prediction, 
     formData, 
@@ -41,10 +43,10 @@ const Predict = () => {
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-blue-700 to-blue-900 bg-clip-text text-transparent">
-              AI Property Valuation - Canada
+              {t('predict.title')}
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto">
-              Get accurate Canadian property price predictions using our 95.97% accurate AI model
+              {t('predict.subtitle')}
             </p>
           </div>
 
@@ -80,7 +82,7 @@ const Predict = () => {
                 )}
 
                 {prediction && !loading && (
-                  <PredictionResults prediction={prediction} />
+                  <PredictionResults prediction={prediction} formData={formData} />
                 )}
 
                 {!prediction && !loading && !error && (
