@@ -17,7 +17,8 @@ import {
   arrayUnion,
   arrayRemove,
 } from 'firebase/firestore';
-import { auth, googleProvider, db, isFirestoreAvailable } from '@/lib/firebase.ts';
+// Import firebase helpers (omit the `.ts` extension to avoid resolution issues in some build environments)
+import { auth, googleProvider, db, isFirestoreAvailable } from '@/lib/firebase';
 
 interface FavoriteHouse {
   id: string;
