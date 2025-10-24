@@ -13,6 +13,7 @@ import heroHome3 from '@/assets/hero-home-3.jpg';
 import analyticsImage from '@/assets/analytics-bg.jpg';
 import { useState, useEffect } from 'react';
 import React from 'react';
+import NewsAndBlogs from '@/components/NewsAndBlogs';
 
 const Landing = () => {
   const { t } = useLanguage();
@@ -252,33 +253,31 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <section className="py-24 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center px-4 py-2 bg-emerald-100/80 text-emerald-700 rounded-full text-sm font-medium mb-6">
               <CheckCircle className="h-4 w-4 mr-2" />
               Professional Real Estate Solutions
             </div>
             <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               AI-Powered Features
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600/80 max-w-3xl mx-auto leading-relaxed">
               Leverage cutting-edge artificial intelligence for comprehensive property analysis, 
               market insights, and investment decision support.
             </p>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Card 
                   key={index} 
-                  className="group p-8 h-full hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-0 bg-white/80 backdrop-blur-sm relative overflow-hidden"
+                  className="group p-8 h-full hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-0 bg-white/60 backdrop-blur-sm relative overflow-hidden"
                   onClick={() => setSelectedFeature(index)}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
                   <div className="relative z-10">
                     <div className="h-16 w-16 rounded-2xl bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                       <Icon className="h-8 w-8 text-white" />
@@ -286,10 +285,9 @@ const Landing = () => {
                     <h3 className="text-2xl font-bold mb-4 text-gray-900 group-hover:text-emerald-600 transition-colors duration-300">
                       {feature.title}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                    <p className="text-gray-600/80 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
                       {feature.description}
                     </p>
-                    
                     <div className="flex items-center mt-6 text-emerald-600 font-medium opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
                       <span className="mr-2">Learn More</span>
                       <ChevronRight className="h-4 w-4" />
@@ -299,10 +297,9 @@ const Landing = () => {
               );
             })}
           </div>
-
           {/* Live Market Insights Card - Repositioned */}
           <div className="mt-16 flex justify-center">
-            <Card className="p-8 bg-gradient-to-br from-white to-gray-50 shadow-2xl border-0 w-full max-w-4xl">
+            <Card className="p-8 bg-white/60 backdrop-blur-sm shadow-2xl border-0 w-full max-w-4xl">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
                 <div className="lg:col-span-1">
                   <div className="h-16 w-16 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center mb-4">
@@ -336,7 +333,7 @@ const Landing = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
@@ -351,24 +348,21 @@ const Landing = () => {
                 <p className="text-white/90">Get detailed property insights with our AI</p>
               </div>
             </div>
-            
             <div>
-              <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-6">
+              <div className="inline-flex items-center px-4 py-2 bg-blue-100/80 text-blue-700 rounded-full text-sm font-medium mb-6">
                 <Shield className="h-4 w-4 mr-2" />
                 Why Choose Value Home Vision
               </div>
-              
               <h2 className="text-5xl font-bold mb-6 text-gray-900 leading-tight">
                 Transform Your
                 <span className="bg-gradient-to-r from-emerald-500 to-blue-500 bg-clip-text text-transparent block">
                   Real Estate Decisions
                 </span>
               </h2>
-              <p className="text-xl text-gray-600 mb-10 leading-relaxed">
+              <p className="text-xl text-gray-600/80 mb-10 leading-relaxed">
                 Our institutional-grade AI delivers the accuracy and insights you need 
                 for confident real estate decisions.
               </p>
-              
               <div className="space-y-8 mb-10">
                 {whyChooseUs.map((item, index) => {
                   const Icon = item.icon;
@@ -381,7 +375,7 @@ const Landing = () => {
                         <h4 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors duration-200">
                           {item.title}
                         </h4>
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="text-gray-600/80 leading-relaxed">
                           {item.description}
                         </p>
                       </div>
@@ -389,7 +383,6 @@ const Landing = () => {
                   );
                 })}
               </div>
-              
               <div className="flex flex-wrap gap-4">
                 <Link to="/predict">
                   <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4">
@@ -408,8 +401,10 @@ const Landing = () => {
         </div>
       </section>
 
+      <NewsAndBlogs />
+
       {/* Final CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white relative overflow-hidden">
+      <section className="py-24 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white relative overflow-hidden bg-black/80 backdrop-blur-sm">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-blue-500/20" />
           <div className="grid grid-cols-6 gap-4 transform rotate-12 scale-150">

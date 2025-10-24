@@ -164,7 +164,7 @@ const PredictionForm = ({ onPrediction, onLoading, onError }: Props) => {
             <div className="text-sm text-blue-100">{t('predict.form.featuresCount')}</div>
           </div>
           <div className="text-center p-3 bg-white/10 rounded-lg">
-            <div className="text-2xl font-bold">14K+</div>
+            <div className="text-2xl font-bold">4K+</div>
             <div className="text-sm text-blue-100">{t('predict.form.properties')}</div>
           </div>
         </div>
@@ -182,7 +182,7 @@ const PredictionForm = ({ onPrediction, onLoading, onError }: Props) => {
           >
             <div className="text-2xl">💰</div>
             <div className="font-semibold text-sm">{t('predict.form.budgetHome')}</div>
-            <div className="text-xs text-gray-500">~$600K</div>
+            <div className="text-xs text-gray-500">~$200K</div>
           </Button>
           <Button 
             type="button" 
@@ -192,7 +192,7 @@ const PredictionForm = ({ onPrediction, onLoading, onError }: Props) => {
           >
             <div className="text-2xl">🏡</div>
             <div className="font-semibold text-sm">{t('predict.form.averageHome')}</div>
-            <div className="text-xs text-gray-500">~$800K</div>
+            <div className="text-xs text-gray-500">~$500K</div>
           </Button>
           <Button 
             type="button" 
@@ -202,7 +202,7 @@ const PredictionForm = ({ onPrediction, onLoading, onError }: Props) => {
           >
             <div className="text-2xl">✨</div>
             <div className="font-semibold text-sm">{t('predict.form.luxuryEstate')}</div>
-            <div className="text-xs text-gray-500">$4M+</div>
+            <div className="text-xs text-gray-500">$2M+</div>
           </Button>
         </div>
       </Card>

@@ -115,12 +115,33 @@
 }
 
 @layer base {
+  .dark body {
+    /* Tone down marble pattern in dark mode with a darker translucent overlay */
+    background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('./assets/main_back.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-blend-mode: overlay;
+  }
+}
+
+@layer base {
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    /* FIX: Remove conflicting background-color and ensure only background-image is set */
+    @apply text-foreground font-sans antialiased;
+
+    /* Subtle white marble pattern background from local asset */
+    background-image: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.1)), url('./assets/main_back.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-blend-mode: overlay;
   }
 
   html {
