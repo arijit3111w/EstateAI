@@ -17,7 +17,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from 'firebase/firestore';
-import { auth, googleProvider, db, isFirestoreAvailable } from '@/lib/firebase';
+import { auth, googleProvider, db, isFirestoreAvailable } from '@/lib/firebase.ts';
 
 interface FavoriteHouse {
   id: string;
