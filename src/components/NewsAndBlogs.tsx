@@ -231,6 +231,14 @@ const NewsAndBlogs = () => {
     }
   };
 
+  // Helper for fallback image
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    if (target.src !== analyticsImage) {
+      target.src = analyticsImage;
+    }
+  };
+
   return (
     <section className="py-24 bg-transparent">
       <div className="container mx-auto px-4">
@@ -280,6 +288,7 @@ const NewsAndBlogs = () => {
                       src={article.imageUrl}
                       alt={article.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={handleImgError}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     <div className="absolute top-4 left-4">
