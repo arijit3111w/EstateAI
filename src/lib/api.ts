@@ -5,7 +5,7 @@ const API_BASE_URL = 'https://arijit3111w-estateai.hf.space';
 
 export const predictPrice = async (features: PropertyFeatures): Promise<PredictionResponse> => {
   const response = await axios.post<PredictionResponse>(
-    `${API_BASE_URL}/predict`,
+    `${API_BASE_URL}/predict/`,
     features,
     {
       headers: {
