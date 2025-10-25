@@ -1,4 +1,5 @@
 // src/components/NewsAndBlogs.tsx
+// --- UPDATED CODE ---
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
@@ -163,36 +164,24 @@ const NewsAndBlogs = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // --- REAL NEWS API FETCH IS NOW ACTIVE ---
+  // --- ⭐ THIS IS THE UPDATED useEffect HOOK ---
   useEffect(() => {
     const fetchRealNews = async () => {
       setLoading(true);
-      // Make sure your .env file has VITE_NEWS_API_KEY="your_key_here"
-      const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
       
-      if (!API_KEY) {
-        console.error("News API key is missing. Check your .env file.");
-        setArticles(mockNewsData); // Fallback to mock data
-        setLoading(false);
-        return;
-      }
-
-      // --- 💡 THIS IS THE UPDATED QUERY ---
-      // It now searches for specific phrases to get more relevant results.
-      const query = '"real estate" OR "property market" OR "housing market" OR "property investment" OR "real estate trends" OR "housing forecast"';
-      
-      // --- ⭐ PAGE SIZE IS NOW 10 ---
-      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${API_KEY}&language=en&sortBy=publishedAt&pageSize=9`;
+      // 1. Call your own API route. No API key is needed here!
+      const url = '/api/news'; 
 
       try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          // NewsAPI often returns error messages in the JSON body even for 4xx/5xx
-          const errData = await response.json();
-          throw new Error(errData.message || 'Network response was not ok');
-        }
+        const response = await fetch(url); // Call your own backend
         const data = await response.json();
 
+        // 2. Check if your *own* server (or NewsAPI via your server) sent an error
+        if (!response.ok) {
+          throw new Error(data.error || 'Network response was not ok');
+        }
+
+        // 3. The rest of your logic is the same!
         if (data.status === "ok") {
           const fetchedArticles: Article[] = data.articles.map((article: any, index: number) => ({
             id: article.url || `real-article-${index}`,
@@ -209,8 +198,8 @@ const NewsAndBlogs = () => {
           }));
           setArticles(fetchedArticles);
         } else {
-          // This handles cases where the API call was successful but NewsAPI returned an error (e.g., bad API key)
-          console.error("Error fetching news:", data.message);
+          // This handles cases where the API call was successful but NewsAPI returned an error
+          console.error("Error from NewsAPI:", data.message);
           setArticles(mockNewsData); // Fallback to mock data on API error
         }
       } catch (error) {
@@ -221,23 +210,7 @@ const NewsAndBlogs = () => {
     };
 
     fetchRealNews();
-  }, []);
-
-
-  // --- MOCK DATA FETCH (This is now commented out) ---
-  /*
-  useEffect(() => {
-    const fetchMockNews = async () => {
-      setLoading(true);
-      // Simulate an API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setArticles(mockNewsData);
-      setLoading(false);
-    };
-
-    fetchMockNews();
-  }, []);
-  */
+  }, []); // This hook still only runs once on mount
 
 
   const getCategoryBadge = (category: Article['category']) => {
