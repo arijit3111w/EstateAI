@@ -250,7 +250,7 @@ def get_model_info():
         "scaler_type": model_metadata['scaler_type']
     }
 
-@app.post("/predict", response_model=PredictionResponse)
+@app.post("/api/estimate", response_model=PredictionResponse)
 def predict_house_price(features: HouseFeatures):
     """Predict house price using the advanced XGBoost model with 25 features"""
     try:

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { PropertyFeatures, PredictionResponse, DetailedPropertyData } from '@/types/property';
 
-const API_BASE_URL = 'https://arijit3111w-estateai.hf.space';
+const API_BASE_URL = 'https://caf9d1646b96.ngrok-free.app';
 
 export const predictPrice = async (features: PropertyFeatures): Promise<PredictionResponse> => {
   const response = await axios.post<PredictionResponse>(
