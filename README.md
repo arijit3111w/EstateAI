@@ -435,3 +435,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Built with ❤️ using React, TypeScript, Python, and AI**
 
 *Transform your real estate decisions with the power of artificial intelligence.*
+
+# AI-Based-Real-Estate-Valuation-System_September_2025
