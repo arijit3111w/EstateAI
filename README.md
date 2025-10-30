@@ -436,4 +436,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 *Transform your real estate decisions with the power of artificial intelligence.*
 
-# AI-Based-R
+# AI-Based-Real-Estate-Valuation-Platform
+
