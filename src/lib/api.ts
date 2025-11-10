@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { PropertyFeatures, PredictionResponse, DetailedPropertyData } from '@/types/property';
 
-const API_BASE_URL = 'https://445f488f8753.ngrok-free.app';
+const API_BASE_URL = 'https://bf2639d8e20d.ngrok-free.app';
 
 export const predictPrice = async (features: PropertyFeatures): Promise<PredictionResponse> => {
   const response = await axios.post<PredictionResponse>(
