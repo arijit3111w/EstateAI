@@ -15,9 +15,9 @@ export default async function handler(
     return res.status(500).json({ error: 'News API key is missing on server' });
   }
 
-  // 2. This is the same query from your frontend
-  const query = '"real estate" OR "property market" OR "housing market" OR "property investment" OR "real estate trends" OR "housing forecast"';
-  const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${API_KEY}&language=en&sortBy=publishedAt&pageSize=9`;
+  // 2. Enhanced query specifically for real estate, property, and housing news
+  const query = '("real estate" OR "property market" OR "housing market" OR "home prices" OR "property prices" OR "real estate investment" OR "housing trends" OR "property valuation" OR "real estate forecast" OR "mortgage rates" OR "property sales" OR "housing affordability") AND (property OR real estate OR housing OR homes)';
+  const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${API_KEY}&language=en&sortBy=publishedAt&pageSize=12&excludeDomains=sports,entertainment,gaming`;
 
   try {
     // 3. Call the NewsAPI from the server

@@ -181,22 +181,39 @@ const NewsAndBlogs = () => {
           throw new Error(data.error || 'Network response was not ok');
         }
 
-        // 3. The rest of your logic is the same!
+        // 3. Filter and process real estate-related articles only
         if (data.status === "ok") {
-          const fetchedArticles: Article[] = data.articles.map((article: any, index: number) => ({
-            id: article.url || `real-article-${index}`,
-            title: article.title,
-            description: article.description || "No description available.",
-            imageUrl: article.urlToImage || analyticsImage, // Use a fallback image
-            sourceName: article.source.name,
-            publishedAt: article.publishedAt,
-            articleUrl: article.url,
-            // Simple logic to categorize articles
-            category: article.title.toLowerCase().includes('forecast') 
-              ? 'Forecast' 
-              : (article.source.name.toLowerCase().includes('blog') ? 'Blog' : 'News'),
-          }));
-          setArticles(fetchedArticles);
+          // Keywords to identify real estate content
+          const realEstateKeywords = [
+            'real estate', 'property', 'housing', 'home', 'house', 'mortgage',
+            'rent', 'apartment', 'condo', 'investment property', 'market price',
+            'valuation', 'real-estate', 'realty', 'residential', 'commercial property'
+          ];
+          
+          const fetchedArticles: Article[] = data.articles
+            .filter((article: any) => {
+              // Check if title or description contains real estate keywords
+              const titleLower = (article.title || '').toLowerCase();
+              const descLower = (article.description || '').toLowerCase();
+              const contentToCheck = titleLower + ' ' + descLower;
+              
+              return realEstateKeywords.some(keyword => contentToCheck.includes(keyword));
+            })
+            .slice(0, 9) // Limit to 9 articles
+            .map((article: any, index: number) => ({
+              id: article.url || `real-article-${index}`,
+              title: article.title,
+              description: article.description || "No description available.",
+              imageUrl: article.urlToImage || analyticsImage, // Use a fallback image
+              sourceName: article.source.name,
+              publishedAt: article.publishedAt,
+              articleUrl: article.url,
+              // Simple logic to categorize articles
+              category: article.title.toLowerCase().includes('forecast') 
+                ? 'Forecast' 
+                : (article.source.name.toLowerCase().includes('blog') ? 'Blog' : 'News'),
+            }));
+          setArticles(fetchedArticles.length > 0 ? fetchedArticles : mockNewsData);
         } else {
           // This handles cases where the API call was successful but NewsAPI returned an error
           console.error("Error from NewsAPI:", data.message);
