@@ -16,8 +16,9 @@ export default async function handler(
   }
 
   // 2. Enhanced query specifically for real estate, property, and housing news
-  const query = '("real estate" OR "property market" OR "housing market" OR "home prices" OR "property prices" OR "real estate investment" OR "housing trends" OR "property valuation" OR "real estate forecast" OR "mortgage rates" OR "property sales" OR "housing affordability") AND (property OR real estate OR housing OR homes)';
-  const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${API_KEY}&language=en&sortBy=publishedAt&pageSize=12&excludeDomains=sports,entertainment,gaming`;
+  // Exclude political terms and focus on property/real estate industry
+  const query = '(("real estate" OR "property market" OR "housing market" OR "home prices" OR "property sales") AND (buyers OR sellers OR investment OR construction OR developers)) NOT (trump OR biden OR election OR congress OR senate OR white house OR politics)';
+  const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${API_KEY}&language=en&sortBy=publishedAt&pageSize=20&domains=realtor.com,zillow.com,redfin.com,inman.com,housingwire.com,therealdeal.com,bisnow.com,cpexecutive.com,globest.com,rew-online.com,propmodo.com`;
 
   try {
     // 3. Call the NewsAPI from the server

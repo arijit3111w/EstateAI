@@ -185,9 +185,18 @@ const NewsAndBlogs = () => {
         if (data.status === "ok") {
           // Keywords to identify real estate content
           const realEstateKeywords = [
-            'real estate', 'property', 'housing', 'home', 'house', 'mortgage',
-            'rent', 'apartment', 'condo', 'investment property', 'market price',
-            'valuation', 'real-estate', 'realty', 'residential', 'commercial property'
+            'real estate', 'property market', 'housing market', 'home price', 
+            'house price', 'mortgage', 'apartment', 'condo', 'residential',
+            'commercial property', 'real-estate', 'realty', 'property sale',
+            'housing trend', 'property invest', 'home sale', 'property developer',
+            'construction', 'realtor', 'listing', 'mls', 'foreclosure'
+          ];
+          
+          // Keywords to exclude (politics, etc.)
+          const excludeKeywords = [
+            'trump', 'biden', 'election', 'congress', 'senate', 'white house',
+            'republican', 'democrat', 'political', 'president', 'governor',
+            'legislation', 'campaign', 'vote', 'ballot'
           ];
           
           const fetchedArticles: Article[] = data.articles
@@ -197,22 +206,45 @@ const NewsAndBlogs = () => {
               const descLower = (article.description || '').toLowerCase();
               const contentToCheck = titleLower + ' ' + descLower;
               
-              return realEstateKeywords.some(keyword => contentToCheck.includes(keyword));
+              // Must contain at least one real estate keyword
+              const hasRealEstateContent = realEstateKeywords.some(keyword => 
+                contentToCheck.includes(keyword)
+              );
+              
+              // Must NOT contain any political keywords
+              const hasPoliticalContent = excludeKeywords.some(keyword => 
+                contentToCheck.includes(keyword)
+              );
+              
+              return hasRealEstateContent && !hasPoliticalContent;
+            })
+            .filter((article: any, index: number, self: any[]) => {
+              // Remove duplicates based on title similarity
+              return index === self.findIndex((a) => 
+                a.title.toLowerCase().trim() === article.title.toLowerCase().trim()
+              );
             })
             .slice(0, 9) // Limit to 9 articles
             .map((article: any, index: number) => ({
               id: article.url || `real-article-${index}`,
               title: article.title,
               description: article.description || "No description available.",
-              imageUrl: article.urlToImage || analyticsImage, // Use a fallback image
+              imageUrl: article.urlToImage || analyticsImage,
               sourceName: article.source.name,
               publishedAt: article.publishedAt,
               articleUrl: article.url,
-              // Simple logic to categorize articles
-              category: article.title.toLowerCase().includes('forecast') 
+              // Categorize articles based on keywords in title
+              category: (article.title.toLowerCase().includes('forecast') || 
+                        article.title.toLowerCase().includes('prediction') ||
+                        article.title.toLowerCase().includes('outlook'))
                 ? 'Forecast' 
-                : (article.source.name.toLowerCase().includes('blog') ? 'Blog' : 'News'),
+                : (article.source.name.toLowerCase().includes('blog') || 
+                   article.title.toLowerCase().includes('opinion') ||
+                   article.title.toLowerCase().includes('analysis'))
+                ? 'Blog' 
+                : 'News',
             }));
+          
           setArticles(fetchedArticles.length > 0 ? fetchedArticles : mockNewsData);
         } else {
           // This handles cases where the API call was successful but NewsAPI returned an error
